@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <iostream>
 #include <list>
@@ -6,6 +6,7 @@
 #include <string>
 #include <algorithm>
 #include <assert.h>
+
 using namespace std;
 
 namespace fu
@@ -13,57 +14,106 @@ namespace fu
 	template<class T>
 	struct list_node
 	{
-		list_node* _prve;
+		list_node* _prev;
 		list_node* _next;
 		T _data;
 
 		list_node(const T& x)
-			:_prve(nullptr),
+			:_prev(nullptr),
 			_next(nullptr),
 			_data(x)
 		{}
 	};
 
-	template<class T>
+	//typedef __list_iterator<T, T&> iterator;
+	//typedef __list_iterator<T, const T&>const iterator;
+	template<class T,class Ref>
 	struct __list_iterator
 	{
 		typedef list_node<T> node;
+		typedef __list_iterator<T, Ref> Self;
 		node* _pnode;
 
 		__list_iterator(node* p)
 			:_pnode(p)
 		{}
 
-		T& operator*()
+		Ref operator*()
 		{
 			return _pnode->_data;
 		}
 
-		__list_iterator<T>& operator++()
+		Self& operator++()
 		{
 			_pnode = _pnode->_next;
 			return *this;
 		}
 
-		__list_iterator<T>& operator--()
+		Self& operator--()
 		{
-			_pnode = _pnode->_prve;
+			_pnode = _pnode->prev;
 			return *this;
 		}
 
-		bool operator!=(const __list_iterator<T>& it)
+		bool operator!=(const Self& it)
 		{
 			return _pnode != it._pnode;
 		}
 	};
 
+	/*template<class T>
+	struct __list_const_iterator
+	{
+		typedef list_node<T> node;
+		node* _pnode;
+
+		__list_const_iterator(node* p)
+			:_pnode(p)
+		{}
+
+		const T& operator*()
+		{
+			return _pnode->_data;
+		}
+
+		__list_const_iterator<T>& operator++()
+		{
+			_pnode = _pnode->_next;
+			return *this;
+		}
+
+		__list_const_iterator<T>& operator--()
+		{
+			_pnode = _pnode->prev;
+			return *this;
+		}
+
+		bool operator!=(const __list_const_iterator<T>& it)
+		{
+			return _pnode != it._pnode;
+		}
+	};*/
 
 	template<class T>
 	class list
 	{
 		typedef list_node<T> node;
 	public:
-		typedef __list_iterator<T> iterator;
+		typedef __list_iterator<T, T&> iterator;
+		typedef __list_iterator<T,const T&> const_iterator;
+		//typedef __list_const_iterator<T> const_iterator;
+		
+		void empty_initialize()
+		{
+			_head = new node(T());
+			_head->_next = _head;
+			_head->_prev = _head;
+		}
+
+		list()
+		{
+			empty_initialize();
+		}
 
 		list(const list<T>& lt)
 		{
@@ -75,16 +125,17 @@ namespace fu
 			}
 		}
 
-		void empty_initialize()
+		list<T>& operator=(const list<T>& lt)
 		{
-			_head = new node(T());
-			_head->_next = _head;
-			_head->_prev = _head;
-		}
-
-		list()
-		{
-			empty_initialize();
+			if (this != &lt)
+			{
+				clear();
+				for (const auto& e : lt)
+				{
+					push_back(e);
+				}
+			}
+			return *this;
 		}
 
 		~list()
@@ -104,14 +155,14 @@ namespace fu
 			}
 		}
 
-		iterator begin() const
+		const_iterator begin() const
 		{
-			return iterator(_head->_next);
+			return const_iterator(_head->_next);
 		}
 
-		iterator end() const
+		const_iterator end() const
 		{
-			return iterator(_head);
+			return const_iterator(_head);
 		}
 
 		iterator begin()
@@ -148,7 +199,7 @@ namespace fu
 
 		T& back()
 		{
-			return _head->_prve->_data;
+			return _head->_prev->_data;
 		}
 
 		void resize(size_t size)
@@ -173,11 +224,11 @@ namespace fu
 		void push_back(const T& x)
 		{
 			/*node* newnode = new node(x);
-			node* tail = _head->_prve;
+			node* tail = _head->prev;
 			tail->_next = newnode;
 			newnode->_next = _head;
-			newnode->_prve = tail;
-			_head->_prve = newnode;*/
+			newnode->prev = tail;
+			_head->prev = newnode;*/
 			insert(begin(), x);
 		}
 
@@ -185,8 +236,8 @@ namespace fu
 		{
 			/*node* newnode = new node(T(x));
 			node* head = _head->_next;
-			head->_prve = newnode;
-			newnode->_prve = _head;
+			head->prev = newnode;
+			newnode->prev = _head;
 			newnode->_next = head;
 			_head->_next = newnode;*/
 			insert(end(), x);
@@ -195,9 +246,9 @@ namespace fu
 		void pop_back()
 		{
 			/*assert(this->size());
-			node* tail = _head->_prve;
-			node* newtail = tail->_prve;
-			_head->_prve = newtail;
+			node* tail = _head->prev;
+			node* newtail = tail->prev;
+			_head->prev = newtail;
 			newtail->_next = _head;
 			delete tail;*/
 			erase(end());
@@ -209,28 +260,29 @@ namespace fu
 			node* head = _head->_next;
 			node* newhead = head->_next;
 			_head->_next = newhead;
-			newhead->_prve = _head;
+			newhead->prev = _head;
 			delete head;*/
 			erase(begin());
 		}
 
-		iterator insert(iterator it,const T& x)
+		iterator insert(iterator pos,const T& x)
 		{
 			node* newnode = new node(T(x));
-			node* prve = it._pnode->_prve;
-			prve->_next = newnode;
-			newnode->_prve = prve;
-			newnode->_next = it._pnode;
-			it._pnode->_prve = newnode;
+			node* prev = pos._pnode->_prev;
+			prev->_next = newnode;
+			newnode->_prev = prev;
+			newnode->_next = pos._pnode;
+			pos._pnode->_prev = newnode;
+
 			return iterator(newnode);
 		}
 		
-		iterator& find(const T& x)
+		void swap(list& x)
 		{
-			;
+
 		}
 		
-		void erase(iterator& it)
+		iterator erase(iterator pos)
 		{
 			assert(pos != end());
 
@@ -239,7 +291,7 @@ namespace fu
 
 			prev->_next = next;
 			next->_prev = prev;
-
+			
 			delete pos._pnode;
 
 			return iterator(next);
@@ -304,5 +356,31 @@ namespace fu
 		{
 			cout << e << ' ';
 		}
+	}
+	void test4()
+	{
+		list<int> lt1;
+		list<int> lt3;
+		lt1.push_back(1);
+		lt1.push_back(1);
+		lt1.push_back(1);
+		lt1.push_back(1);
+		list<int> lt2(lt1);
+		lt3 = lt1;
+		for (auto e : lt2)
+		{
+			cout << e << ' ';
+		}
+	}
+	void test5()
+	{
+		list<int> lt1;
+		lt1.push_back(1);
+		lt1.push_back(2);
+		lt1.push_back(3);
+		lt1.push_back(4);
+		list<int>::iterator it = lt1.begin();
+		
+
 	}
 }
