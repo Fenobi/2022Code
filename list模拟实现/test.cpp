@@ -5,13 +5,12 @@
 
 int main()
 {
-	//fu::test1();
-	//fu::test2();
-	//fu::test3();
-	//fu::test4();
-	fu::test5();
-	list<int> lt;
-	list<int> lt1(2, 10);
-	lt.swap(lt1);
+	/*fu::test1();
+	fu::test2();
+	fu::test3();
+	fu::test4();
+	fu::test5();*/
+
+	fu::test6();
 	return 0;
 }

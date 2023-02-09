@@ -43,21 +43,49 @@ namespace fu
 			return _pnode->_data;
 		}
 
+		T* operator->()
+		{
+			return &_pnode->_data;
+		}
+
+		//++it
 		Self& operator++()
 		{
 			_pnode = _pnode->_next;
 			return *this;
 		}
-
+		//--it
 		Self& operator--()
 		{
-			_pnode = _pnode->prev;
+			_pnode = _pnode->_prev;
 			return *this;
 		}
 
-		bool operator!=(const Self& it)
+		//it++
+		Self operator++(int)
+		{
+			Self tmp(*this);
+			_pnode = _pnode->_next;
+
+			return tmp;
+		}
+		//it--
+		Self operator--(int)
+		{
+			Self tmp(*this);
+			_pnode = _pnode->_prev;
+
+			return tmp;
+		}
+
+		bool operator!=(const Self& it)const
 		{
 			return _pnode != it._pnode;
+		}
+
+		bool operator==(const Self& it)const
+		{
+			return _pnode == it._pnode;
 		}
 	};
 
@@ -115,26 +143,64 @@ namespace fu
 			empty_initialize();
 		}
 
-		list(const list<T>& lt)
+		////一般写法
+		//list(const list<T>& lt)
+		//{
+		//	empty_initialize();
+
+		//	for (const auto& e : lt)
+		//	{
+		//		push_back(e);
+		//	}
+		//}
+		
+		//list<T>& operator=(const list<T>& lt)
+		//{
+		//	if (this != &lt)
+		//	{
+		//		clear();
+		//		for (const auto& e : lt)
+		//		{
+		//			push_back(e);
+		//		}
+		//	}
+		//	return *this;
+		//}
+
+		//现代写法
+		//迭代器区间构造
+		template <class InputIterator>
+		list(InputIterator first, InputIterator last)
 		{
 			empty_initialize();
-
-			for (const auto& e : lt)
+			while (first != last)
 			{
-				push_back(e);
+				push_back(*first);
+				++first;
 			}
 		}
 
-		list<T>& operator=(const list<T>& lt)
+		void swap(list<T>& lt)
+		//void swap(list& lt)
 		{
-			if (this != &lt)
-			{
-				clear();
-				for (const auto& e : lt)
-				{
-					push_back(e);
-				}
-			}
+			std::swap(_head, lt._head);
+		}
+
+		// lt2(lt1)
+		list(const list<T>& lt)
+		//list(const list& lt)
+		{
+			empty_initialize();
+
+			list tmp(lt.begin(), lt.end());
+			swap(tmp);
+		}
+
+		//lt3 = lt1;
+		list<T>& operator=(list<T> lt)
+		//list& operator=(list lt)
+		{
+			swap(lt);
 			return *this;
 		}
 
@@ -175,21 +241,23 @@ namespace fu
 			return iterator(_head);
 		}
 
-		size_t size()
+		size_t size() const
 		{
-			size_t count = 0;
+			/*size_t count = 0;
 			list<T>::iterator it = this->begin();
 			while (it != this->end())
 			{
 				++count;
 				++it;
 			}
-			return count;
+			return count;*/
+			return _size;
 		}
 
-		bool empty()
+		bool empty() const
 		{
-			return !this->size();
+			return _size == 0;
+
 		}
 
 		T& front()
@@ -229,7 +297,7 @@ namespace fu
 			newnode->_next = _head;
 			newnode->prev = tail;
 			_head->prev = newnode;*/
-			insert(begin(), x);
+			insert(end(), x);
 		}
 
 		void push_front(const T& x)
@@ -240,7 +308,7 @@ namespace fu
 			newnode->prev = _head;
 			newnode->_next = head;
 			_head->_next = newnode;*/
-			insert(end(), x);
+			insert(begin(), x);
 		}
 
 		void pop_back()
@@ -251,7 +319,7 @@ namespace fu
 			_head->prev = newtail;
 			newtail->_next = _head;
 			delete tail;*/
-			erase(end());
+			erase(--end());
 		}
 
 		void pop_front()
@@ -274,12 +342,8 @@ namespace fu
 			newnode->_next = pos._pnode;
 			pos._pnode->_prev = newnode;
 
+			++_size;
 			return iterator(newnode);
-		}
-		
-		void swap(list& x)
-		{
-
 		}
 		
 		iterator erase(iterator pos)
@@ -293,12 +357,14 @@ namespace fu
 			next->_prev = prev;
 			
 			delete pos._pnode;
+			--_size;
 
 			return iterator(next);
 		}
 
 	private:
 		node* _head;
+		size_t _size;
 	};
 
 	void test1()
@@ -334,8 +400,8 @@ namespace fu
 		lt.pop_back();
 		lt.push_front(10);
 		lt.pop_front();
-		//		lt.pop_back();
-				//lt.resize(10);
+		//lt.pop_back();
+		//lt.resize(10);
 		for (auto e : lt)
 		{
 			cout << e << ' ';
@@ -380,7 +446,31 @@ namespace fu
 		lt1.push_back(3);
 		lt1.push_back(4);
 		list<int>::iterator it = lt1.begin();
-		
+	}
 
+	struct Pos
+	{
+		Pos(int x = 0, int y = 0)
+			:_x(x)
+			,_y(y)
+		{}
+
+		int _x;
+		int _y; 
+
+	};
+
+	void test6()
+	{
+		list<Pos> lt;
+		lt.push_back(Pos(1, 1));
+		lt.push_back(Pos(2, 2));
+		lt.push_back(Pos(3, 3));
+		list<Pos>::iterator it = lt.begin();
+		while (it != lt.end())
+		{
+			cout << it->_x << ":" << it->_y << '\n';
+			++it;
+		}
 	}
 }
