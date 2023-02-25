@@ -25,13 +25,13 @@ namespace fu
 		{}
 	};
 
-	//typedef __list_iterator<T, T&> iterator;
-	//typedef __list_iterator<T, const T&>const iterator;
-	template<class T,class Ref>
+	//typedef __list_iterator<T, T&, T*> iterator;
+	//typedef __list_iterator<T, const T&, const T*>const iterator;
+	template<class T,class Ref,class Ptr>
 	struct __list_iterator
 	{
 		typedef list_node<T> node;
-		typedef __list_iterator<T, Ref> Self;
+		typedef __list_iterator<T, Ref,Ptr> Self;
 		node* _pnode;
 
 		__list_iterator(node* p)
@@ -43,7 +43,7 @@ namespace fu
 			return _pnode->_data;
 		}
 
-		T* operator->()
+		Ptr operator->()
 		{
 			return &_pnode->_data;
 		}
@@ -127,8 +127,8 @@ namespace fu
 	{
 		typedef list_node<T> node;
 	public:
-		typedef __list_iterator<T, T&> iterator;
-		typedef __list_iterator<T,const T&> const_iterator;
+		typedef __list_iterator<T, T&, T*> iterator;
+		typedef __list_iterator<T, const T&, const T*> const_iterator;
 		//typedef __list_const_iterator<T> const_iterator;
 		
 		void empty_initialize()
