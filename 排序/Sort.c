@@ -19,7 +19,7 @@ void Swap(int* x, int* y)
 
 void InsertSort(int* a, int n)
 {
-	// [0,end]²åÈëend+1 [0£¬end+1]ÓĞĞò
+	// [0,end]æ’å…¥end+1 [0ï¼Œend+1]æœ‰åº
 	for (int i = 0; i < n - 1; i++)
 	{
 		int end = i;
@@ -115,7 +115,7 @@ void SelectSort(int* a, int n)
 	{
 		int maxi = end;
 		int mini = begin;
-		for (int i = begin + 1; i <= end; i++)
+		for (int i = begin; i <= end; i++)
 		{
 			if (a[maxi] < a[i])
 			{
@@ -196,19 +196,19 @@ int GetMidIndex(int* a, int left, int right)
 
 int PartSort(int* a, int left, int right)
 {
-	//ÈıÊıÈ¡ÖĞ
+	//ä¸‰æ•°å–ä¸­
 	int mid = GetMidIndex(a, left, right);
 	Swap(&a[left], &a[mid]);
 
 	int keyi = left;
 	while (left < right)
 	{
-		//ÕÒĞ¡
+		//æ‰¾å°
 		while (a[keyi] <= a[right] && left < right)
 		{
 			right--;
 		}
-		//ÕÒ´ó
+		//æ‰¾å¤§
 		while (a[keyi] >= a[left] && left < right)
 		{
 			left++;
@@ -222,7 +222,7 @@ int PartSort(int* a, int left, int right)
 	Swap(&a[keyi], &a[meeti]);
 	return meeti;
 }
-//ÍÚ¿Ó·¨
+//æŒ–å‘æ³•
 int PartSort2(int* a, int left, int right)
 {
 	int mid = GetMidIndex(a, left, right);
@@ -248,7 +248,7 @@ int PartSort2(int* a, int left, int right)
 	a[hole] = key;
 	return left;
 }
-//Ç°ºóÖ¸Õë·¨
+//å‰åæŒ‡é’ˆæ³•
 int PartSort3(int* a, int left, int right)
 {
 	int mid = GetMidIndex(a, left, right);
@@ -287,7 +287,7 @@ void QuickSortNonR(int* a, int begin, int end)
 {
 	ST st;
 	StackInit(&st);
-	//²åÈëÊı±íÊ¾Çø¼ä
+	//æ’å…¥æ•°è¡¨ç¤ºåŒºé—´
 	StackPush(&st, begin);
 	StackPush(&st, end);
 	while (!StackEmpty(&st))
@@ -327,11 +327,11 @@ void _MergeSort(int* a, int* tmp, int begin, int end)
 	}
 	int mid = (begin + end) / 2;
 
-	//µİ¹é·¶Î§[begin,mid] [mid+1,end]
+	//é€’å½’èŒƒå›´[begin,mid] [mid+1,end]
 	_MergeSort(a, tmp, begin, mid);
 	_MergeSort(a, tmp, mid + 1, end);
 
-	//¹é²¢ È¡Ğ¡µÄÎ²²å
+	//å½’å¹¶ å–å°çš„å°¾æ’
 	int begin1 = begin, end1 = mid;
 	int begin2 = mid + 1, end2 = end;
 	int i = begin;
@@ -355,7 +355,7 @@ void _MergeSort(int* a, int* tmp, int begin, int end)
 		tmp[i++] = a[begin2++];
 	}
 
-	//¿½±´»ØÔ­Êı×é
+	//æ‹·è´å›åŸæ•°ç»„
 	memcpy(a + begin, tmp + begin, (end - begin + 1) * sizeof(int));
 }
 
@@ -389,22 +389,22 @@ void MergeSortNonR(int* a, int n)
 			int begin1 = j, end1 = j + gap - 1;
 			int begin2 = j + gap, end2 = j + 2 * gap - 1;
 
-			//µÚÒ»×éÔ½½ç
+			//ç¬¬ä¸€ç»„è¶Šç•Œ
 			if (end1 >= n)
 			{
 				break;
 			}
 
-			//µÚ¶ş×éÈ«²¿Ô½½ç
+			//ç¬¬äºŒç»„å…¨éƒ¨è¶Šç•Œ
 			if (begin2 >= n)
 			{
 				break;
 			}
 
-			//µÚ¶ş×é²¿·ÖÔ½½ç
+			//ç¬¬äºŒç»„éƒ¨åˆ†è¶Šç•Œ
 			if (end2 >= n)
 			{
-				//ĞŞÕıend2£¬¼ÌĞø¹é²¢
+				//ä¿®æ­£end2ï¼Œç»§ç»­å½’å¹¶
 				end2 = n - 1;
 			}
 

@@ -29,9 +29,9 @@ namespace fu
 		}*/
 
 		string(const char* str="")
+			:_size(strlen(str))
+			,_capacity(_size)
 		{
-			_size = strlen(str);
-			_capacity = _size;
 			_str = new char[_capacity + 1];
 
 			strcpy(_str, str);
@@ -61,7 +61,19 @@ namespace fu
 			string tmp(s._str);
 			swap(tmp);
 		}
-
+		
+		//移动构造
+		string(string&& s)
+		{
+			swap(s);
+		}
+		//移动赋值
+		string& operator=(string&& s)
+		{
+			swap(s);
+			return *this;
+		}
+		
 		~string()
 		{
 			delete[] _str;
@@ -120,7 +132,7 @@ namespace fu
 		void push_back(char ch)
 		{
 			
-			if (_capacity == _size)
+			if (_capacity >= _size)
 			{
 				size_t newCapacity = _capacity == 0 ? 4 : _capacity * 2;
 				reserve(newCapacity);
@@ -299,9 +311,9 @@ namespace fu
 		
 
 	private:
-		char* _str;
-		size_t _size;
-		size_t _capacity;
+		char* _str = nullptr;
+		size_t _size = 0;
+		size_t _capacity = 0;
 
 		const static size_t npos = -1;
 	};
