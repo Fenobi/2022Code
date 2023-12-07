@@ -335,7 +335,7 @@ namespace fu
 
 		iterator insert(iterator pos,const T& x)
 		{
-			node* newnode = new node(T(x));
+			node* newnode = new node(x);
 			node* prev = pos._pnode->_prev;
 			prev->_next = newnode;
 			newnode->_prev = prev;
